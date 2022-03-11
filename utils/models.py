@@ -359,6 +359,34 @@ class gwnet(nn.Module):
         x = self.end_conv_2(x)  # downsample to (bs, seq_length, 207, nfeatures)
         return x.transpose(1,3)
 
+
+
+class gwnet_wrapper(nn.Module):
+    def __init__(self, device, num_nodes, dropout=0.3, supports=None, gcn_bool=True,
+                 addaptadj=True, aptinit=None, in_dim=2, out_dim=12,
+                 residual_channels=32, dilation_channels=32,
+                 skip_channels=256, end_channels=512, kernel_size=2, blocks=4, layers=2,
+                 apt_size=10, cat_feat_gc=False,weights_path=None,nsegs=455):
+        super().__init__()
+        self.nsegs=nsegs
+        self.model=gwnet(device,num_nodes, dropout, supports, gcn_bool,
+                 addaptadj, aptinit, in_dim, out_dim,
+                 residual_channels, dilation_channels,
+                 skip_channels, end_channels, kernel_size, blocks, layers,
+                 apt_size, cat_feat_gc)
+
+        if weights_path is not None:
+            self.model.load_state_dict(torch.load(weights_path, map_location=device))
+
+    def forward(self, x):
+        shape_x=x.shape
+        x = x.reshape(int(shape_x[0] / self.nsegs), self.nsegs, shape_x[1], shape_x[2]).movedim((1,2,3),(2,3,1))
+        x=self.model(x)
+        x = x.squeeze(dim=0)
+        return torch.movedim(x, (0, 1, 2), (2, 0, 1))
+
+
+
 ## Helper function to reformat RGCN data for GWN
 
 def reshape_for_gwn(cat_data, keep_portion=None):
