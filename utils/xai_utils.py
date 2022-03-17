@@ -24,5 +24,5 @@ def integrated_gradients(x, model, n_steps, baseline_x, temporal_focus=None, spa
         else:
             integrated_gradients = integrated_gradients + gradients
 
-    integrated_gradients = x_diff.detach().numpy() * integrated_gradients[0].detach().numpy()
+    integrated_gradients = x_diff.detach().cpu().numpy() * integrated_gradients[0].detach().cpu().numpy()
     return (integrated_gradients)
