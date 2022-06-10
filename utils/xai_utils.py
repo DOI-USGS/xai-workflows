@@ -41,7 +41,7 @@ def expected_gradients(x, x_set, adj_matrix, model, n_samples, temporal_focus=No
     for k in range(n_samples):
         # SAMPLE A RANDOM BASELINE INPUT
         rand_year = np.random.choice(n_series//n_segs) # rand_time may be more accurate
-        baseline_x = x_4D[rand_year]
+        baseline_x = x_4D[rand_year].to(device)
 
         # SAMPLE A RANDOM SCALE ALONG THE DIFFERENCE
         scale = np.random.uniform()
