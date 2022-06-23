@@ -40,13 +40,8 @@ def expected_gradients(x, x_set, adj_matrix, model, n_samples, temporal_focus=No
 
     for k in range(n_samples):
         # SAMPLE A RANDOM BASELINE INPUT
-        baseline_x = torch.empty(n_segs, seq_len, num_vars).to(device)
-        # for all segments
-        for seg in range(n_segs):
-            # pick one of the years
-            seg_year = np.random.choice(n_series//n_segs)  #do we want to be sampling random segs or random years?
-            # fill the baseline with a random year of data from each segment
-            baseline_x[seg] = x_set_4D[seg_year, seg]
+        rand_year = np.random.choice(n_series//n_segs) # rand_time may be more accurate
+        baseline_x = x_4D[rand_year].to(device)
 
         # SAMPLE A RANDOM SCALE ALONG THE DIFFERENCE
         scale = np.random.uniform()
